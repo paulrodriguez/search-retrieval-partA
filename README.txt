@@ -5,4 +5,6 @@ your Lucene index.
 To build and run the sample code, use the "run" ant target inside
 the directory with build.xml by typing "ant run".
 
+PAUL RODRIGUEZ
+JACQUELINE LO
 project 3
