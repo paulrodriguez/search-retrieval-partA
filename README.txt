@@ -1,10 +1,11 @@
-This example contains a simple utility class to simplify opening database
-connections in Java applications, such as the one you will write to build
-your Lucene index. 
-
-To build and run the sample code, use the "run" ant target inside
-the directory with build.xml by typing "ant run".
-
 PAUL RODRIGUEZ
 JACQUELINE LO
 project 3
+
+search queries will be done with these set of attributes:
+item name, category, sller, buy price, bidder, ending time and description.
+
+need to create indices in MySQL on seller, buy price, bidder and ending time.
+
+
+the attributes item name, category, and description will need inverted indices 
