@@ -45,10 +45,10 @@ public class Indexer {
 	doc.add(new Field("Name", name, Field.Store.YES, Field.Index.TOKENIZED));
 	/*probably will not need to store them since we only return itemid and name*/
 	doc.add(new Field("Description", des, Field.Store.NO, Field.Index.TOKENIZED));
-	doc.add(new Field("Category",/*string of categories*/, Field.Store.NO, Field.Index.TOKENIZED));
+	doc.add(new Field("Category",category, Field.Store.NO, Field.Index.TOKENIZED));
 	
 	//for this we need to concatenate Name, Description, and Cateories 
-	String fullSearch = name+" " + des;
+	String fullSearch = name + " " + category + " " + des;
 	doc.add(new Fields("searchText",fullSearch, Field.Store.NO, Field.Index.TOKENIZED));
     }
 
