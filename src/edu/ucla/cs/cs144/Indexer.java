@@ -21,35 +21,48 @@ public class Indexer {
     private IndexWriter writer = null;
     //erases the index and creates a new one
     public IndexWriter getIndexWriter(boolean create) throws Exception {
-	if (writer = null) {
-	    writer = new IndexWriter(System.getenv("LUCENE_INDEX")+"/ebay-index",new StandardAnalyzer(), create );
-	}
-	return writer;
+	if (writer == null) {
+	    writer = new IndexWriter(System.getenv("LUCENE_INDEX")+"/ebay-index", 
+				new StandardAnalyzer(), create);
+		}
+		return writer;
     }
     
-    public void closeIndexWriter() throw Exception {
-	if(writer != null) {
-	    writer.close();
-	}
+    public void closeIndexWriter() throws Exception {
+		if(writer != null) {
+			writer.close();
+		}
     }
 
-    public void indexItems(ResultSet items) throws Exception {
-	System.out.println("indexing Items");
-	IndexWriter w = getIndexWriter(false);
-	Document doc = new Document();
-	String id = items.getString("ItemID");
-	string name = items.getString("Name");
-	string des = items.getString("Description");
-	//will need to change for the values from the result of the queries 
-	doc.add(new Field("ItemID", id, Field.Store.YES, Field.Index.NO));
-	doc.add(new Field("Name", name, Field.Store.YES, Field.Index.TOKENIZED));
-	/*probably will not need to store them since we only return itemid and name*/
-	doc.add(new Field("Description", des, Field.Store.NO, Field.Index.TOKENIZED));
-	doc.add(new Field("Category",/*string of categories*/, Field.Store.NO, Field.Index.TOKENIZED));
-	
-	//for this we need to concatenate Name, Description, and Cateories 
-	String fullSearch = name+" " + des;
-	doc.add(new Fields("searchText",fullSearch, Field.Store.NO, Field.Index.TOKENIZED));
+    public void indexItems(ResultSet items, ResultSet categories) throws Exception {
+		System.out.println("indexing Items");
+		IndexWriter w = getIndexWriter(false);
+		Document doc = new Document();
+		String id = items.getString("ItemID");
+		String name = items.getString("Name");
+		String des = items.getString("Description");
+
+		while(categories.next())
+		{
+			String categories = "";
+			for(String cat : cats) // loop through category results
+			{
+				categories += cat + "|||"; // using ||| as delimiter here, may need to change
+			}
+			System.out.println(categories); //TODO remove
+		}
+		System.out.println(categories); //TODO remove
+
+		//will need to change for the values from the result of the queries 
+		doc.add(new Field("ItemID", id, Field.Store.YES, Field.Index.NO));
+		doc.add(new Field("Name", name, Field.Store.YES, Field.Index.TOKENIZED));
+		/*probably will not need to store them since we only return itemid and name*/
+		doc.add(new Field("Description", des, Field.Store.NO, Field.Index.TOKENIZED));
+		doc.add(new Field("Category", categories, Field.Store.NO, Field.Index.TOKENIZED));
+		
+		//for this we need to concatenate Name, Description, and Categories 
+		String fullSearch = name+ " " + des + categories;
+		doc.add(new Field("searchText", fullSearch, Field.Store.NO, Field.Index.TOKENIZED));
     }
 
     public void rebuildIndexes() {
