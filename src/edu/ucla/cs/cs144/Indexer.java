@@ -33,7 +33,7 @@ public class Indexer {
 	}
     }
 
-    public void indexItems(ResultSet items) throws Exception {
+    public void indexItems(ResultSet items, String category) throws Exception {
 	System.out.println("indexing Items");
 	IndexWriter w = getIndexWriter(false);
 	Document doc = new Document();
@@ -92,14 +92,30 @@ public class Indexer {
 	ResultSet items  = st.executeQuery("SELECT ItemID, Name, Description FROM Items ORDER BY ItemID");
 	
 	//change query if needed
-	ResultSet categories  = st.executeQuery("SELECT DISTINCT Category FROM Categories ORDER BY ItemID");
+	ResultSet categories  = st.executeQuery("SELECT * FROM Categories ORDER BY ItemID");
+	
+	Map<Integer, String> cats = new HashMap<Integer, String>();
+	
+	while(categories.next()) {
+	    int iid = categories.getInt("ItemID");
+	    String category = categories.getString("Category");
+	    if(cats.containsKey(iid)) {
+		cats.put(iid, cats.get(iid)+" "+category);
+	    }
+	    else {
+		cat.put(iid,cateogry);
+	    }
+	}
+	
 	
        
 	//need to somehow get all the categories for each item and store them
 	
 	while(items.next()) {
-	    indexItems(items);
+	    
+	    indexItems(items, cats.get(items.getInt("ItemID")));
 	}
+
 	closeIndexWriter();
         // close the database connection
 	try {
