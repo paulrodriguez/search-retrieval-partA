@@ -13,6 +13,8 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 
 import java.util.HashMap;
+import java.util.ArrayList;
+
 public class Indexer {
     
     /** Creates a new instance of Indexer */
@@ -34,8 +36,7 @@ public class Indexer {
 		}
     }
 	
-    public void indexItems(ResultSet items, String categories) throws Exception {
-		//System.out.println("indexing Items");
+    public void indexItems(ResultSet items, ArrayList item_cats) throws Exception {
 		IndexWriter w = getIndexWriter(false);
 		Document doc = new Document();
 		String id = items.getString("ItemID");
@@ -43,29 +44,45 @@ public class Indexer {
 		String des = items.getString("Description");
 		
 		//this will allow to split the categories based on the delimiter given
-		String[] category_parts = categories.split("|||");
+		//String[] category_parts = categories.split("|||");
 		
 		/*
-		probably wont need this
+		int cat_cnt = 0; // counter for category results
 		while(categories.next())
 		{
+			category_parts[cat_cnt] = categores.getString("Category");
+			System.out.println(category_parts[cat_cnt]);
+			*/
+			/*
 			String categories = "";
 			for(String cat : cats) // loop through category results
 			{
 				categories += cat + "|||"; // using ||| as delimiter here, may need to change
 			}
-		}*/
-		//System.out.println(categories); //TODO remove
+		}
+			*/
 
 		//will need to change for the values from the result of the queries 
 		doc.add(new Field("ItemID", id, Field.Store.YES, Field.Index.NO));
 		doc.add(new Field("Name", name, Field.Store.YES, Field.Index.TOKENIZED));
 		/*probably will not need to store them since we only return itemid and name*/
 		doc.add(new Field("Description", des, Field.Store.NO, Field.Index.TOKENIZED));
-		//doc.add(new Field("Category", categories, Field.Store.NO, Field.Index.TOKENIZED));
-		for (int i = 0; i < category_parts.length; i++) {
-			doc.add(new Field("Category",category_parts[i],Field.Store.NO, Field.Index.UN_TOKENIZED));
+
+		for(int i=0; i<item_cats.size(); i++)
+		{
+			// this adds a new Field "Category" for every single category.
+			// Not sure if this works in Lucene--you will probably have to change 
+			// this from items_cats.get(i), to some string that concatenates all
+			// of the categories
+			doc.add(new Field("Category", item_cats.get(i).toString(), Field.Store.NO, Field.Index.UN_TOKENIZED));
+			//doc.add(new Field("Category", category_parts[i], Field.Store.NO, Field.Index.UN_TOKENIZED));
 		}
+		//doc.add(new Field("Category", categories, Field.Store.NO, Field.Index.TOKENIZED));
+		/*
+		for (int i = 0; i < category_parts.length; i++) {
+			doc.add(new Field("Category", category_parts[i], Field.Store.NO, Field.Index.UN_TOKENIZED));
+		}
+		*/
 		//for this we need to concatenate Name, Description, and Categories 
 		//String fullSearch = name+ " " + des + categories;
     }
@@ -111,6 +128,7 @@ public class Indexer {
 		
 			Statement stmt2 = conn.createStatement();
 			//change query if needed
+			/*
 			ResultSet categories  = stmt2.executeQuery("SELECT * FROM Categories ORDER BY ItemID");
 		
 			HashMap<Integer, String> cats = new HashMap<Integer, String>();
@@ -129,14 +147,25 @@ public class Indexer {
 		
 		   
 			//need to somehow get all the categories for each item and store them
+			//*/
 		
 			while(items.next()) {
-			
-				indexItems(items, cats.get(items.getInt("ItemID")));
+				ArrayList item_cats = new ArrayList(); // hold correspondies categories for an item
+
+				ResultSet item_cats_rs = stmt2.executeQuery(
+						"SELECT * FROM Categories WHERE ItemID = " + 
+						items.getInt("ItemID") + ";");
+				while(item_cats_rs.next())
+				{
+					item_cats.add(item_cats_rs.getString("Category"));
+				}
+
+				//indexItems(items, cats.get(items.getInt("ItemID")));
+				indexItems(items, item_cats);
 			}
+
 			items.close();
 			stmt1.close();
-			categories.close();
 			stmt2.close();
 			closeIndexWriter();
 		} catch (Exception e) {
