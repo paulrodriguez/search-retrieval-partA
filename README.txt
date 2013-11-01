@@ -3,9 +3,13 @@ JACQUELINE LO
 project 3
 
 search queries will be done with these set of attributes:
-item name, category, sller, buy price, bidder, ending time and description.
+item name, category, seller, buy price, bidder, ending time and description.
 
-need to create indices in MySQL on seller, buy price, bidder and ending time.
+we decided to create SQL indices on seller, bidder, buy price and ending time because they can be compared easily with equality conditions.
+
+the seller, buy price, and ending time indices are created on the attributes of our Items Table. Although our Users table contains the UserID as the primary key, which applies to both seller ids and bidder ids, we felt it was best to apply an index on sellers and bidders on Items and Bids tables, respectively, because it would be more efficient since it will probably be easier to access data this way. 
 
 
-the attributes item name, category, and description will need inverted indices 
+the attributes item name, category, and description will be indexed using the inverted indices provided by Lucene since they require word comparison and checking if a word might be contained in one of these attributes.
+
+the item name and description will be tokenized, while categories will be added as is, that is, each individual category will not be tokenized, and each category will be considered as a box in the lexicon dictionary of the inverted index.
