@@ -49,7 +49,6 @@ public class Indexer {
 			{
 				categories += cat + "|||"; // using ||| as delimiter here, may need to change
 			}
-			System.out.println(categories); //TODO remove
 		}
 		System.out.println(categories); //TODO remove
 
