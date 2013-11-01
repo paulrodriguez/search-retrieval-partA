@@ -2,6 +2,8 @@ PAUL RODRIGUEZ
 JACQUELINE LO
 project 3
 
+Using Paul's project 2 files/set-up.
+
 search queries will be done with these set of attributes:
 item name, category, seller, buy price, bidder, ending time and description.
 
