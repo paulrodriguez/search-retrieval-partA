@@ -42,30 +42,11 @@ public class Indexer {
 		String id = items.getString("ItemID");
 		String name = items.getString("Name");
 		String des = items.getString("Description");
-		
-		//this will allow to split the categories based on the delimiter given
-		//String[] category_parts = categories.split("|||");
-		
-		/*
-		int cat_cnt = 0; // counter for category results
-		while(categories.next())
-		{
-			category_parts[cat_cnt] = categores.getString("Category");
-			System.out.println(category_parts[cat_cnt]);
-			*/
-			/*
-			String categories = "";
-			for(String cat : cats) // loop through category results
-			{
-				categories += cat + "|||"; // using ||| as delimiter here, may need to change
-			}
-		}
-			*/
 
-		//will need to change for the values from the result of the queries 
+		// will need to change for the values from the result of the queries 
 		doc.add(new Field("ItemID", id, Field.Store.YES, Field.Index.NO));
 		doc.add(new Field("Name", name, Field.Store.YES, Field.Index.TOKENIZED));
-		/*probably will not need to store them since we only return itemid and name*/
+		// probably will not need to store them since we only return itemid and name
 		doc.add(new Field("Description", des, Field.Store.NO, Field.Index.TOKENIZED));
 
 		for(int i=0; i<item_cats.size(); i++)
@@ -74,15 +55,10 @@ public class Indexer {
 			// Not sure if this works in Lucene--you will probably have to change 
 			// this from items_cats.get(i), to some string that concatenates all
 			// of the categories
-			doc.add(new Field("Category", item_cats.get(i).toString(), Field.Store.NO, Field.Index.UN_TOKENIZED));
-			//doc.add(new Field("Category", category_parts[i], Field.Store.NO, Field.Index.UN_TOKENIZED));
+			doc.add(new Field("Category", item_cats.get(i).toString(), 
+						Field.Store.NO, Field.Index.UN_TOKENIZED));
 		}
-		//doc.add(new Field("Category", categories, Field.Store.NO, Field.Index.TOKENIZED));
-		/*
-		for (int i = 0; i < category_parts.length; i++) {
-			doc.add(new Field("Category", category_parts[i], Field.Store.NO, Field.Index.UN_TOKENIZED));
-		}
-		*/
+
 		//for this we need to concatenate Name, Description, and Categories 
 		//String fullSearch = name+ " " + des + categories;
     }
@@ -122,8 +98,8 @@ public class Indexer {
 			//will make an index on the itemid, cat
 			Statement stmt1 = conn.createStatement();
 
-			//here we need to get the itemid name and description
-			//change query depending on who's implementation is used
+			// here we need to get the itemid name and description
+			// (change query depending on whose implementation is used)
 			ResultSet items  = stmt1.executeQuery("SELECT ItemID, Name, Description FROM Items ORDER BY ItemID");
 		
 			Statement stmt2 = conn.createStatement();
@@ -143,11 +119,8 @@ public class Indexer {
 					cats.put(iid,category);
 				}
 			}
-		
-		
-		   
 			//need to somehow get all the categories for each item and store them
-			//*/
+			*/
 		
 			while(items.next()) {
 				ArrayList item_cats = new ArrayList(); // hold correspondies categories for an item
@@ -159,8 +132,9 @@ public class Indexer {
 				{
 					item_cats.add(item_cats_rs.getString("Category"));
 				}
+				item_cats_rs.close();
 
-				//indexItems(items, cats.get(items.getInt("ItemID")));
+				// give ResultSet's to helper function for indexing
 				indexItems(items, item_cats);
 			}
 
@@ -171,7 +145,8 @@ public class Indexer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-			// close the database connection
+
+		// close the database connection
 		try {
 			conn.close();
 		} catch (SQLException ex) {
