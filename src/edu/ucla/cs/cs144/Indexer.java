@@ -41,7 +41,7 @@ public class Indexer {
 		String id = items.getString("ItemID");
 		String name = items.getString("Name");
 		String des = items.getString("Description");
-
+/**this is a test*/
 		while(categories.next())
 		{
 			String categories = "";
