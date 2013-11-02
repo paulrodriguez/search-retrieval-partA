@@ -11,6 +11,11 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
+//TODO remove (for testing):
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermEnum;
+//end TODO remove
 
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -20,12 +25,15 @@ public class Indexer {
     /** Creates a new instance of Indexer */
     public Indexer() {
     }
+
     private IndexWriter writer = null;
+
     //erases the index and creates a new one
     public IndexWriter getIndexWriter(boolean create) throws Exception {
 	if (writer == null) {
-	    writer = new IndexWriter(System.getenv("LUCENE_INDEX")+"/ebay-index", 
+	    writer = new IndexWriter(System.getenv("LUCENE_INDEX") + "/ebay-index", 
 				new StandardAnalyzer(), create);
+		// TODO change from StandardAnalyzer() to custom analyzer (if doing one big delimited string)
 		}
 		return writer;
     }
@@ -42,6 +50,9 @@ public class Indexer {
 		String id = items.getString("ItemID");
 		String name = items.getString("Name");
 		String des = items.getString("Description");
+		//TODO not sure if should be using delimiters here
+		// Form first part of composite text (add categories to later)
+		String fullSearchableText = id + "|||" + name + "|||" + des;
 
 		// will need to change for the values from the result of the queries 
 		doc.add(new Field("ItemID", id, Field.Store.YES, Field.Index.NO));
@@ -57,10 +68,23 @@ public class Indexer {
 			// of the categories
 			doc.add(new Field("Category", item_cats.get(i).toString(), 
 						Field.Store.NO, Field.Index.UN_TOKENIZED));
+
+			fullSearchableText += "|||" + item_cats.get(i);
 		}
+
+		//TODO delete - for testing
+		//System.out.println(fullSearchableText);
+
+		doc.add(new Field("content", fullSearchableText, Field.Store.NO, 
+					Field.Index.TOKENIZED));
+
+		// TODO delete. Test indices created with a search.
+		//searcher=new IndexSearcher(System.getenv("LUCENE_INDEX"), new StandardAnalyzer(), create);
 
 		//for this we need to concatenate Name, Description, and Categories 
 		//String fullSearch = name+ " " + des + categories;
+		
+		writer.addDocument(doc);
     }
 
     public void rebuildIndexes() {
@@ -137,6 +161,19 @@ public class Indexer {
 				// give ResultSet's to helper function for indexing
 				indexItems(items, item_cats);
 			}
+
+			//TODO delete--for testing
+			System.out.println("done indexing");
+		IndexReader r=IndexReader.open(System.getenv("LUCENE_INDEX") + "/ebay-index");
+		TermEnum terms=r.terms();
+		System.out.println("num docs: "+r.numDocs());
+		while(terms.next())
+		{
+			Term t=terms.term();
+		System.out.println(t.text());
+		}
+		terms.close(); r.close();
+
 
 			items.close();
 			stmt1.close();
