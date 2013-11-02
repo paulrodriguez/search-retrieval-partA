@@ -55,7 +55,6 @@ public class Indexer {
 		String des = items.getString("Description");
 		//TODO not sure if should be using delimiters here
 		// Form first part of composite text (add categories to later)
-		String fullSearchableText = id + "|||" + name + "|||" + des;
 
 		// will need to change for the values from the result of the queries 
 		doc.add(new Field("ItemID", id, Field.Store.YES, Field.Index.NO));
@@ -63,6 +62,7 @@ public class Indexer {
 		// probably will not need to store them since we only return itemid and name
 		doc.add(new Field("Description", des, Field.Store.NO, Field.Index.TOKENIZED));
 
+		String catString = "";
 		for(int i=0; i<item_cats.size(); i++)
 		{
 			// this adds a new Field "Category" for every single category.
@@ -72,8 +72,10 @@ public class Indexer {
 			doc.add(new Field("Category", item_cats.get(i).toString(), 
 						Field.Store.NO, Field.Index.UN_TOKENIZED));
 
-			fullSearchableText += "|||" + item_cats.get(i);
+			catString += "|||" + item_cats.get(i);
 		}
+		
+		String fullSearchableText = id + "|||" + name + "|||" + des + catString;
 
 		//TODO delete - for testing
 		//System.out.println(fullSearchableText);
@@ -166,7 +168,8 @@ public class Indexer {
 			}
 
 			//TODO delete--for testing
-			System.out.println("done indexing");
+			System.out.println("-----------------------------------------------------------------------------------------\n\n\n\n\n");
+			System.out.println("Here are the indices that have been created: ");
 		IndexReader r=IndexReader.open(System.getenv("LUCENE_INDEX") + "/ebay-index");
 		TermEnum terms=r.terms();
 		System.out.println("num docs: "+r.numDocs());
