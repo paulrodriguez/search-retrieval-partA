@@ -11,12 +11,13 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
-/* for testing:
+/*
+// for testing:
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermEnum;
+//end testing
 */
-
 import java.util.HashMap;
 import java.util.ArrayList;
 
@@ -54,6 +55,7 @@ public class Indexer {
 		String des = items.getString("Description");
 
 		doc.add(new Field("ItemID", id, Field.Store.YES, Field.Index.NO));
+		
 		doc.add(new Field("Name", name, Field.Store.YES, Field.Index.TOKENIZED));
 		// probably will not need to store them since we only return itemid and name
 		doc.add(new Field("Description", des, Field.Store.NO, Field.Index.TOKENIZED));
@@ -62,14 +64,15 @@ public class Indexer {
 		for(int i=0; i<item_cats.size(); i++)
 		{
 			// this adds a new duplicate Field "Category" for every single category.
-			doc.add(new Field("Category", item_cats.get(i).toString(), 
-						Field.Store.NO, Field.Index.UN_TOKENIZED));
+			//doc.add(new Field("Category", item_cats.get(i).toString(), 
+				//		Field.Store.NO, Field.Index.UN_TOKENIZED));
 
 			catString += " " + item_cats.get(i); // to add onto fullSearchableText
 		}
-		
+		doc.add(new Field("Category", catString, Field.Store.NO, Field.Index.TOKENIZED));
 		// Composite field 
 		String fullSearchableText = name + " "+ des + " " + catString;
+		 
 		doc.add(new Field("content", fullSearchableText, Field.Store.NO, 
 					Field.Index.TOKENIZED));
 
@@ -133,7 +136,8 @@ public class Indexer {
 				indexItems(items, item_cats);
 			}
 
-			/* for testing
+			/*
+			// for testing
 			System.out.println("-----------------------------------------------------------------------------------------\n\n\n\n\n");
 			System.out.println("Here are the indices that have been created: ");
 			IndexReader r=IndexReader.open(System.getenv("LUCENE_INDEX") + "/ebay-index");
@@ -145,8 +149,8 @@ public class Indexer {
 			System.out.println(t.text());
 			}
 			terms.close(); r.close();
+			//end testing
 			*/
-
 			items.close();
 			stmt1.close();
 			stmt2.close();
