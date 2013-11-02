@@ -74,7 +74,7 @@ public class Indexer {
 		}
 		
 		//String fullSearchableText = id + "|||" + name + "|||" + des + catString;
-		String fullSearchableText = name + des + catString;
+		String fullSearchableText = name + " "+ des + " " + catString;
 
 		//TODO delete - for testing
 		//System.out.println(fullSearchableText);
