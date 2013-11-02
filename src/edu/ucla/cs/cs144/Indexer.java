@@ -45,8 +45,11 @@ public class Indexer {
     }
 	
     public void indexItems(ResultSet items, ArrayList item_cats) throws Exception {
+		
 		IndexWriter w = getIndexWriter(false);
+		
 		Document doc = new Document();
+		
 		String id = items.getString("ItemID");
 		String name = items.getString("Name");
 		String des = items.getString("Description");
@@ -119,13 +122,13 @@ public class Indexer {
 		*/
 		try {
 			getIndexWriter(true);
-			//will make an index on the itemid, cat
+			//used to create a query to Items table
 			Statement stmt1 = conn.createStatement();
 
-			// here we need to get the itemid name and description
-			// (change query depending on whose implementation is used)
+			// this gets the tuples with itemid name and description
 			ResultSet items  = stmt1.executeQuery("SELECT ItemID, Name, Description FROM Items ORDER BY ItemID");
 		
+			//used to execute queries to Categories table
 			Statement stmt2 = conn.createStatement();
 			//change query if needed
 			/*
@@ -147,8 +150,8 @@ public class Indexer {
 			*/
 		
 			while(items.next()) {
-				ArrayList item_cats = new ArrayList(); // hold correspondies categories for an item
-
+				ArrayList<String> item_cats = new ArrayList<String>(); // hold corresponding categories for an item
+				
 				ResultSet item_cats_rs = stmt2.executeQuery(
 						"SELECT * FROM Categories WHERE ItemID = " + 
 						items.getInt("ItemID") + ";");
@@ -174,10 +177,10 @@ public class Indexer {
 		}
 		terms.close(); r.close();
 
-
 			items.close();
 			stmt1.close();
 			stmt2.close();
+	
 			closeIndexWriter();
 		} catch (Exception e) {
 			e.printStackTrace();
