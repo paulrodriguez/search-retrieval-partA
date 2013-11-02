@@ -1,6 +1,6 @@
 PAUL RODRIGUEZ
 JACQUELINE LO
-project 3
+project 3a
 
 Using Paul's project 2 files/set-up.
 
