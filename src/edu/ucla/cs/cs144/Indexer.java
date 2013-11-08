@@ -44,7 +44,7 @@ public class Indexer {
 		}
     }
 	
-    public void indexItems(ResultSet items, ArrayList item_cats) throws Exception {
+    public void indexItems(ResultSet items, String item_cats) throws Exception {
 		
 		IndexWriter w = getIndexWriter(false);
 		
@@ -60,7 +60,7 @@ public class Indexer {
 		// probably will not need to store them since we only return itemid and name
 		doc.add(new Field("Description", des, Field.Store.NO, Field.Index.TOKENIZED));
 
-		String catString = ""; // concatenate all categories for content string
+		/**String catString = ""; // concatenate all categories for content string
 		for(int i=0; i<item_cats.size(); i++)
 		{
 			// this adds a new duplicate Field "Category" for every single category.
@@ -68,11 +68,14 @@ public class Indexer {
 				//		Field.Store.NO, Field.Index.UN_TOKENIZED));
 
 			catString += " " + item_cats.get(i); // to add onto fullSearchableText
-		}
-		doc.add(new Field("Category", catString, Field.Store.NO, Field.Index.TOKENIZED));
+		}*/
+		
+		doc.add(new Field("Category", item_cats, Field.Store.NO, Field.Index.TOKENIZED));
+		//doc.add(new Field("Category", catString, Field.Store.NO, Field.Index.TOKENIZED));
+	//	System.out.println(catString);
 		// Composite field 
-		String fullSearchableText = name + " "+ des + " " + catString;
-		 
+		//String fullSearchableText = name + " "+ des + " " + catString;
+		String fullSearchableText = name + " "+ des + " " + item_cats;
 		doc.add(new Field("content", fullSearchableText, Field.Store.NO, 
 					Field.Index.TOKENIZED));
 
@@ -119,16 +122,17 @@ public class Indexer {
 		
 			// used to execute queries to Categories table
 			Statement stmt2 = conn.createStatement();
-		
+			//String item_cats = "";
 			while(items.next()) {
-				ArrayList<String> item_cats = new ArrayList<String>(); // hold corresponding categories for an item
-				
+				//ArrayList<String> item_cats = new ArrayList<String>(); // hold corresponding categories for an item
+				String item_cats = "";
 				ResultSet item_cats_rs = stmt2.executeQuery(
 						"SELECT * FROM Categories WHERE ItemID = " + 
 						items.getInt("ItemID") + ";");
 				while(item_cats_rs.next())
 				{
-					item_cats.add(item_cats_rs.getString("Category"));
+					item_cats += item_cats_rs.getString("Category") + " ";
+				//item_cats.add(item_cats_rs.getString("Category"));
 				}
 				item_cats_rs.close();
 

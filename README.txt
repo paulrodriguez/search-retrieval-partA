@@ -14,4 +14,4 @@ the seller, buy price, and ending time indices are created on the attributes of 
 
 the attributes item name, category, and description will be indexed using the inverted indices provided by Lucene since they require word comparison and checking if a word might be contained in one of these attributes.
 
-the item name and description will be tokenized, while categories will be added as is, that is, each individual category will not be tokenized, and each category will be considered as a box in the lexicon dictionary of the inverted index.
+the item name,category and description will be tokenized, and there is a 'content' index that joins all three of them and tokenizes them for searching
