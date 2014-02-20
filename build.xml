@@ -20,6 +20,7 @@
 
     <target name="clean">
 		<delete dir="${obj-dir}" />
+		<delete file="project3a.zip" />
     </target>
 
     <target name="compile" depends="init">
